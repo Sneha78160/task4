@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Car Website</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(-45deg, #1E88E5, #FF6F61, #FFD700, #32CD32, #8A2BE2);
+      background-size: 400% 400%;
+      animation: gradientBG 15s ease infinite;
+    }
+
+    @keyframes gradientBG {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    h1, h2, h3 {
+      background: linear-gradient(270deg, #1E88E5, #FF6F61, #FFD700, #32CD32, #8A2BE2);
+      background-size: 400% 400%;
+      animation: headingBG 8s ease infinite;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      color: transparent;
+      display: inline-block;
+      padding: 5px 10px;
+      border-radius: 8px;
+    }
+
+    @keyframes headingBG {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    header {
+      background: linear-gradient(-45deg, #1E88E5, #FF6F61, #FFD700, #32CD32, #8A2BE2);
+      background-size: 400% 400%;
+      animation: gradientBG 15s ease infinite;
+      color: white;
+      text-align: center;
+      padding: 20px;
+      text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
+    }
+
+    nav a {
+      color: white;
+      text-decoration: none;
+      margin: 0 15px;
+    }
+
+    section {
+      padding: 20px;
+      border-bottom: 1px solid #ddd;
+      background: rgba(255, 255, 255, 0.8);
+      border-radius: 8px;
+      margin: 10px auto;
+      max-width: 800px;
+    }
+
+    input, button, select {
+      padding: 8px;
+      margin: 5px 0;
+    }
+
+    ul {
+      list-style-type: none;
+      padding: 0;
+    }
+
+    li {
+      background: #f1f1f1;
+      padding: 10px;
+      margin-bottom: 5px;
+      border-radius: 5px;
+    }
+
+    @media screen and (min-width: 768px) {
+      section {
+        max-width: 80%;
+        font-size: 1.1rem;
+      }
+      li {
+        font-size: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header>
+    <h1>Cars Showroom</h1>
+    <nav>
+      <a href="#about">About</a>
+      <a href="#todo">Car Notes</a>
+      <a href="#products">Car Lists</a>
+    </nav>
+  </header>
+
+  <!-- About Section -->
+  <section id="about">
+    <h2>About This Website</h2>
+    <p>This website is about showcasing car listings, taking car-related notes, and exploring car categories.</p>
+    <h3>Car Info</h3>
+    <ul>
+      <li>Latest Car Models</li>
+      <li>Maintenance Tips</li>
+      <li>Electric vs Petrol Cars</li>
+    </ul>
+    <h3>Contact</h3>
+    <p>Email: carsupport@example.com</p>
+  </section>
+
+  <!-- Car Notes Section -->
+  <section id="todo">
+    <h2>Car Notes</h2>
+    <input type="text" id="taskInput" placeholder="Write a car note..." />
+    <button onclick="addTask()">Add Note</button>
+    <ul id="taskList"></ul>
+  </section>
+
+  <!-- Car Lists -->
+  <section id="products">
+    <h2>Car Lists</h2>
+
+    <label>Filter by Type:</label>
+    <select id="categoryFilter">
+      <option value="all">All</option>
+      <option value="suv">SUV</option>
+      <option value="sedan">Sedan</option>
+      <option value="electric">Electric</option>
+    </select>
+
+    <label>Sort by:</label>
+    <select id="sortFilter">
+      <option value="default">Default</option>
+      <option value="price">Price</option>
+      <option value="rating">Rating</option>
+    </select>
+
+    <ul id="productList"></ul>
+  </section>
+
+  <!-- JavaScript -->
+  <script>
+    // Car Notes
+    const taskList = document.getElementById('taskList');
+    const taskInput = document.getElementById('taskInput');
+
+    function loadTasks() {
+      const tasks = JSON.parse(localStorage.getItem('carNotes')) || [];
+      taskList.innerHTML = '';
+      tasks.forEach((task, index) => {
+        const li = document.createElement('li');
+        li.textContent = task;
+        li.onclick = () => deleteTask(index);
+        taskList.appendChild(li);
+      });
+    }
+
+    function addTask() {
+      const task = taskInput.value.trim();
+      if (task === '') return;
+      const tasks = JSON.parse(localStorage.getItem('carNotes')) || [];
+      tasks.push(task);
+      localStorage.setItem('carNotes', JSON.stringify(tasks));
+      taskInput.value = '';
+      loadTasks();
+    }
+
+    function deleteTask(index) {
+      const tasks = JSON.parse(localStorage.getItem('carNotes'));
+      tasks.splice(index, 1);
+      localStorage.setItem('carNotes', JSON.stringify(tasks));
+      loadTasks();
+    }
+
+    loadTasks();
+
+    // Car Products
+    const products = [
+      { name: "Tesla Model 3", category: "electric", price: 4500000, rating: 4.8 },
+      { name: "Toyota Fortuner", category: "suv", price: 3500000, rating: 4.5 },
+      { name: "Honda Civic", category: "sedan", price: 2500000, rating: 4.3 }
+    ];
+
+    function formatPrice(price) {
+      return "\u20B9" + price.toLocaleString("en-IN");
+    }
+
+    function updateProducts() {
+      const category = document.getElementById('categoryFilter').value;
+      const sort = document.getElementById('sortFilter').value;
+
+      let filtered = category === 'all'
+        ? [...products]
+        : products.filter(p => p.category === category);
+
+      if (sort === 'price') filtered.sort((a, b) => a.price - b.price);
+      if (sort === 'rating') filtered.sort((a, b) => b.rating - a.rating);
+
+      displayProducts(filtered);
+    }
+
+    function displayProducts(list) {
+      const productList = document.getElementById('productList');
+      productList.innerHTML = '';
+      list.forEach(product => {
+        const li = document.createElement('li');
+        li.textContent = `${product.name} - ${formatPrice(product.price)} - Rating: ${product.rating}`;
+        productList.appendChild(li);
+      });
+    }
+
+    document.getElementById('categoryFilter').addEventListener('change', updateProducts);
+    document.getElementById('sortFilter').addEventListener('change', updateProducts);
+
+    updateProducts(); // Initial load
+  </script>
+
+</body>
+</html>
